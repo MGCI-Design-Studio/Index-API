@@ -12,7 +12,7 @@ Terminology
 - `interval` a list of intervals separated by commas. Each interval should be like `N1-N2`
 - `updateSettings` either `"__FIND_DIFFERENCES__"` or `"__TICKET__"`
 	- `"__FIND_DIFFERENCES__"` no interval needed, finds differences and updates them
-	- `"__TICKET"` uses the interval
+	- `"__TICKET__"` uses the interval
 
 Main Methods
 - resetProps()
