@@ -1,0 +1,167 @@
+<script type="text/babel">
+
+    const { BrowserRouter: Router, Switch, Route, Routes, useLocation, Link } = ReactRouterDOM;
+    const { Box, ThemeProvider, createTheme, CssBaseline } = window['MaterialUI'];
+
+    const App = ({settingData, updateSettings, accountData, setAccountData, panels, checkAuth}) => {
+        return (
+            <div>
+                <Switch>
+                    {/* If the current URL is /about, this route is rendered
+            while the rest are ignored */}
+                    <Route path="/settings">
+                        <Settings settings={settingData} setSettings={updateSettings}/>
+                    </Route>
+
+                    {/* Note how these two routes are ordered. The more specific
+            path="/contact/:id" comes before path="/contact" so that
+            route will render when viewing an individual contact */}
+                    <Route path="/account">
+                        <AccountContainer accountData={accountData} setAccountData={setAccountData}/>
+                    </Route>
+                    <Route path="/react">
+                        <Index accountData={accountData} panels={panels} checkAuth={checkAuth}/>
+                    </Route>
+
+                    {/* If none of the previous routes render anything,
+            this route acts as a fallback.
+
+            Important: A route with path="/" will *always* match
+            the URL because all URLs begin with a /. So that's
+            why we put this one last of all */}
+                    <Route path="/">
+                        <LandingPage />
+                    </Route>
+                </Switch>
+            </div>
+        );
+    }
+
+
+    function Content() {
+        const location = useLocation();
+        console.log(location);
+        return (
+            <Typography variant="h1" sx={{ pb: 2 }} color="text.secondary">
+                Current route: {location.pathname}
+            </Typography>
+        );
+    }
+
+    const Webapp = ({}) => {
+        const cookies = new UniversalCookie();
+        const [settings, setSettings] = useState({"dark": false});
+        const [accountData, setAccountData] = useState(null);
+        const [panels, setPanels] = useState(["Loading..."]);
+
+        const handleAccess = (access) => {
+            const positions = ["Staff Advisor", "Director", "Junior Director", "Member", "Volunteer", "Public"]
+            const branches = ["Design", "Documentation", "Operations", "Finance", "Prismatic"]
+            let data = false;
+            if (access) {
+                data = {name: access[2], position: positions.indexOf(access[1]), branch: branches.indexOf(access[0])};
+            }
+            else if (access === false) {
+                data = {name: "Guest", position: 5, branch: 4};
+            }
+            setAccountData(data);
+
+            google.script.run.withSuccessHandler(setPanels).getPanels(data);
+        }
+
+        function checkAuth(func) {
+            let account_id = cookies.get('userSessionToken', { path: '/' });
+            if (account_id) {
+                axios
+                    .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${account_id}`, {
+                        headers: {
+                            Authorization: `Bearer ${account_id}`,
+                            Accept: 'application/json'
+                        }
+                    })
+                    .then((res) => {
+                        console.log(res);
+                        if (res.data.verified_email) {
+                            func(res);
+                        }
+                    })
+                    .catch((err) => {
+                        console.log("checkAuth Error:")
+                        console.log(err)
+                        func(false);
+                        setAccountData(false);
+                    });
+            }
+            else{
+                func(false);
+                setAccountData(false);
+            }
+        }
+
+        function setAccess(){
+            function access(res){
+                setAccountData(null);
+                if (res) {
+                    google.script.run.withSuccessHandler(handleAccess).checkAccess(res.data.email);
+                }
+                else {
+                    handleAccess(null);
+                }
+            }
+            checkAuth(access);
+        }
+
+        useEffect(() => {
+            setAccess();
+        }, []);
+
+        console.log(window);
+        const [indexTheme, setIndexTheme] = useState(
+            createTheme({
+                palette: {
+                    primary: {
+                        main: '#6456BF',
+                    },
+                    secondary: {
+                        main: '#D1603A',
+                    },
+                },
+                typography: {
+                    fontFamily: [
+                        'JetBrains Mono ',
+                        'Roboto',
+                    ].join(','),
+                    body1: {
+                        fontSize: 13,
+                    },
+                },
+            })
+        );
+
+        return(
+            <Router>
+                <ThemeProvider theme={indexTheme}>
+                    <CssBaseline />
+                    <Box>
+                        <NavBar accountData={accountData}/>
+                        <App
+                            settingData={settings}
+                            updateSettings={{
+                                "theme": setIndexTheme,
+                                "settings": setSettings
+                            }}
+                            accountData={accountData}
+                            setAccountData={setAccess}
+                            checkAuth={checkAuth}
+                            panels={panels}
+                        />
+                    </Box>
+                </ThemeProvider>
+            </Router>
+        )
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(
+        <Webapp/>
+    );
+</script>

@@ -1,0 +1,108 @@
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const { Accordion, AccordionSummary, Icon, AccordionDetails, Tabs, Grid, Typography } = window['MaterialUI'];
+
+    const SSView = ({panelArray, itemArray, accountData}) => {
+        const [panelSelection, setPanelSelection] = useState(0);
+        const [itemSelection, setItemSelection] = useState(0);
+        const [value, setValue] = useState("");
+        const [errorLog, setErrorLog] = useState([]);
+
+        const handlePanelChange = (event) => {
+            console.log(event);
+            const newValue = parseInt(event.target.id.split("tab-")[1]);
+            setPanelSelection(newValue);
+            setValue(panelArray[newValue]);
+        };
+
+        const handleItemChange = (event) => {
+            const newValue = parseInt(event.target.id.split("tab-")[1]);
+            setItemSelection(newValue);
+            setValue(itemArray[panelSelection][newValue]);
+        };
+
+        function eachItem(){
+            let itemPanels = [];
+            itemArray.forEach((item, index) => {
+                if(item.length > 0){
+                    itemPanels.push(TabPanelGroup(value, item, "items" + index, setErrorLog));
+                }
+            });
+
+            return itemPanels;
+        }
+
+        return (
+            <div>
+                <Box sx={{pt: 2, pl:1, pr:1 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={2}>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<Icon>expand_more</Icon>}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <Typography variant={"subtitle1"}>Panels</Typography>
+                                </AccordionSummary>
+                                <Box sx={{ height: 'sm' }}>
+                                    <AccordionDetails>
+                                        <Tabs
+                                            orientation="vertical"
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                            value={panelSelection}
+                                            onClick={handlePanelChange}
+                                            aria-label="Panel Tabs"
+                                            sx={{ borderRight: 1, borderColor: 'divider' }}
+                                        >
+                                            {TabGroup(panelArray, "panels")}
+                                        </Tabs>
+                                    </AccordionDetails>
+                                </Box>
+                            </Accordion>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<Icon>expand_more</Icon>}
+                                    aria-controls="panel2a-content"
+                                    id="panel2a-header"
+                                >
+                                    <Typography variant={"subtitle1"}>Items</Typography>
+                                </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Tabs
+                                            orientation="vertical"
+                                            variant="scrollable"
+                                            scrollButtons={false}
+                                            value={itemSelection}
+                                            onClick={handleItemChange}
+                                            aria-label="Item tabs"
+                                            sx={{ height: 300, borderRight: 1, borderColor: 'divider' }}
+                                        >
+                                            {TabGroup(itemArray[panelSelection], "items" + panelSelection)}
+                                        </Tabs>
+                                    </AccordionDetails>
+                            </Accordion>
+                            <Paper sx={{ mt:2, p:2, minHeight: '20vw' }} variant="outlined">
+                                <Box>
+                                    <Typography variant="subtitle1" gutterBottom={true}>Function Logs:</Typography>
+                                    <Divider />
+                                    <Box sx={{mt:2}}>
+                                        {errorLog.map((error) => {
+                                            return <Typography variant="body2" gutterBottom="true">{error}</Typography>
+                                        })}
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={10}>
+                            {eachItem()}
+                            {TabPanelGroup(value, panelArray, "panels", setErrorLog)}
+                        </Grid>
+                    </Grid>
+                </Box>
+            </div>
+        );
+    }
+</script>

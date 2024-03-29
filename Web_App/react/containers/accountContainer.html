@@ -1,0 +1,59 @@
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const { Box, Typography, Button } = window['MaterialUI'];
+
+    const AccountContainer = ({accountData, setAccountData}) => {
+        const cookies = new UniversalCookie();
+
+        window.addEventListener(
+            "message",
+            (event) => {
+                if (event.origin !== "https://mgci-design-studio.github.io") return;
+                cookies.set('userSessionToken', event.data.access_token, { path: '/' });
+                setAccountData();
+            },
+            false,
+        );
+
+        const logOut = (event) => {
+            cookies.remove('userSessionToken', { path: '/' });
+            setAccountData();
+        }
+
+        function accountScreen(){
+            if (accountData) {
+                return (
+                    <div>
+                        <Typography variant="body1" color="inherit">
+                            Welcome {accountData.name}!
+                        </Typography>
+                        <Button sx={{m:2}} variant="outlined" onClick={logOut}>Logout</Button>
+                    </div>
+                );
+            } else if (accountData === false) {
+                return (
+                    <iframe style={{border: "0", width:"100%", height: "500px", overflow: "auto"}} id="accountIFrame" src="https://mgci-design-studio.github.io/"></iframe>
+                );
+            }
+            else {
+                return (
+                    <Typography variant="body1" color="inherit">
+                        Loading...
+                    </Typography>
+                );
+            }
+        }
+
+        return (
+            <div>
+                <Box justifyContent="center" sx={{ p:2, width:1}}>
+                    <Typography variant="h6" color="inherit">
+                        Account Settings
+                    </Typography>
+                    {accountScreen()}
+                </Box>
+            </div>
+        );
+    }
+</script>

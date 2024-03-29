@@ -1,0 +1,73 @@
+<script type="text/babel">
+    const { useState } = React;
+    const { useEffect } = React;
+    const { Box } = window['MaterialUI'];
+    const Settings = ({settings, setSettings}) => {
+        const indexLightTheme = createTheme({
+            palette: {
+                primary: {
+                    main: '#6456BF',
+                },
+                secondary: {
+                    main: '#D1603A',
+                },
+                background: {
+                    default: '#F5F5F5',
+                },
+            },
+            typography: {
+                fontFamily: [
+                    'JetBrains Mono ',
+                    'Roboto',
+                ].join(','),
+                body1: {
+                    fontSize: 13,
+                },
+            },
+        });
+
+        const indexDarkTheme = createTheme({
+            palette: {
+                mode: 'dark',
+                primary: {
+                    main: '#6456BF',
+                },
+                secondary: {
+                    main: '#D1603A',
+                },
+                background: {
+                    default: '#1A1A1A',
+                },
+            },
+            typography: {
+                fontFamily: [
+                    'JetBrains Mono ',
+                    'Roboto',
+                ].join(','),
+                body1: {
+                    fontSize: 13,
+                },
+            },
+        });
+
+        const handleDarkChange = (event) => {
+            setSettings["theme"](event.target.checked ? indexDarkTheme : indexLightTheme);
+            setSettings["settings"]({...settings, "dark": event.target.checked});
+        }
+
+        return (
+            <div>
+                <Box sx={{pt: 2, pl:1, pr:1 }}>
+                    <Typography variant="h6" color="primary">
+                        Dark Mode
+                    </Typography>
+                    <MaterialUI.Switch
+                        checked={settings["dark"]}
+                        onChange={handleDarkChange}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                </Box>
+            </div>
+        );
+    }
+</script>

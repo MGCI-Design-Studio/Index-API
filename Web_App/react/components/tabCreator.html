@@ -1,0 +1,59 @@
+<script type="text/babel">
+    const {Tab, Box, Typography} = window['MaterialUI'];
+
+    function a11yProps(index, name) {
+        return {
+            id: `${name}-tab-${index}`,
+            key: `${name}-tab-${index}`,
+            'aria-controls': `${name}-tabpanel-${index}`,
+        };
+    }
+
+    function TabGroup(tabItems, name) {
+        let tabs = [];
+        if (tabItems === null || tabItems === undefined){
+            return (<Typography varient="p"> Loading... </Typography>);
+        }
+        else if (tabItems.length === 0){
+            return (<Typography varient="p"> No Items </Typography>);
+        }
+        tabItems.forEach((item, index) => {
+            if (item !== "" && item != null){
+                tabs.push(<Tab label={item} {...a11yProps(index, name)}/>);
+            }
+        });
+
+        return(tabs);
+    }
+
+    function TabPanelGroup(value, tabItems, name, changeErrorLog){
+        let tabs = [];
+        if (tabItems === null || tabItems === undefined){
+            return (<Typography varient="h5"> Loading... </Typography>);
+        }
+        else if (tabItems.length === 0){
+            return (<Typography varient="h5"> ACCESS RESTRICTED </Typography>);
+        }
+        tabItems.forEach((item, index) => {
+            if (item !== "" && item != null) {
+                tabs.push(
+                    <div
+                        role="tabpanel"
+                        hidden={value !== item}
+                        id={`${name}-tabpanel-${index}`}
+                        key= {`${name}-tabpanel-${index}`}
+                        aria-labelledby={`${name}-tab-${index}`}
+                    >
+
+                        {value === item && (
+                            <Box>
+                                <TabData panel={item} isPanel={name === "panels"} changeError={changeErrorLog}/>
+                            </Box>
+                        )}
+                    </div>);
+            }
+        });
+
+        return(tabs);
+    }
+</script>

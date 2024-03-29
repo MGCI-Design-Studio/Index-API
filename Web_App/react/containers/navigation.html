@@ -1,0 +1,80 @@
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const { Button, AppBar, Toolbar, Box, CircularProgress, SvgIcon, Badge, IconButton, Icon } = window['MaterialUI'];
+    const { Link } = ReactRouterDOM;
+
+    const NavBar = ({accountData}) => {
+        const [anchorEl, setAnchorEl] = useState(null);
+        const isMenuOpen = Boolean(anchorEl);
+
+        return (
+            <div>
+                <Box sx={{ flexGrow: 1 }}>
+                    <AppBar position="static">
+                        <Toolbar spacing={2}>
+                            <svg
+                                width="60mm"
+                                height="18.782713mm"
+                                viewBox="0 0 60 18.782713"
+                                version="1.1"
+                                id="svg1"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <defs
+                                    id="defs1">
+                                    <rect
+                                        x="240.03566"
+                                        y="221.67999"
+                                        width="403.82468"
+                                        height="232.97578"
+                                        id="rect1" />
+                                </defs>
+                                <path
+                                    id="text1"
+                                    d="M 0,0 V 2.8122329 18.782713 h 3.1303478 0.00684 V 0 H 3.1303478 2.8122329 Z M 8.3480128,0 V 18.782713 H 11.478365 V 9.3910433 l 3.130341,9.3916697 h 3.130352 V 0 H 14.608706 V 9.3910433 L 11.478365,0 Z M 22.956713,0 v 10.956217 h 3.130352 V 3.1303478 h 3.130341 V 15.652365 h -6.260693 v 3.130348 h 6.578825 c 0.782603,0 1.442602,-0.269353 1.980645,-0.80739 0.554352,-0.554358 0.831575,-1.222851 0.831575,-2.005459 V 2.8122329 c 0,-0.7826067 -0.277223,-1.442606 -0.831575,-1.98065421 C 30.97814,0.2772309 30.318141,0 29.535538,0 H 26.087065 Z M 37.565425,0 V 3.1303478 H 45.3913 V 0 h -3.912944 z m 13.043529,0 6.260693,18.782713 H 60 L 53.739295,0 Z M 56.869647,0 56.087056,2.3477614 57.652239,7.0432831 60,0 Z M 37.565425,7.8258694 V 10.956217 H 45.3913 V 7.8258694 h -3.912944 z m 15.391291,3.9135616 -2.347762,7.043282 h 3.130341 l 0.782591,-2.34776 z m -15.391291,3.912934 v 3.130348 H 45.3913 v -3.130348 h -3.912944 z" />
+                            </svg>
+                            <Button sx={{ml:2}} component={Link} to="/" color="inherit">Home</Button>
+                            <Button component={Link} to="/react" color="inherit">Panels</Button>
+                            <Box sx={{ flexGrow: 1 }} />
+                            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                                <IconButton
+                                    size="large"
+                                    aria-label="show 17 new notifications"
+                                    color="inherit"
+                                >
+                                    <Badge badgeContent={17} color="error">
+                                        <Icon>notifications</Icon>
+                                    </Badge>
+                                </IconButton>
+                                <IconButton
+                                    size="large"
+                                    aria-label="account of current user"
+                                    aria-controls="account-menu"
+                                    aria-haspopup="true"
+                                    component={Link}
+                                    to="/account"
+                                    color="inherit"
+                                >
+                                    <Icon>account_circle</Icon>
+                                    {accountData == null && <CircularProgress color="secondary" size={24} />}
+                                </IconButton>
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="show more"
+                                    aria-controls="settings-menu"
+                                    aria-haspopup="true"
+                                    component={Link}
+                                    to="/settings"
+                                    color="inherit"
+                                >
+                                    <Icon>settings</Icon>
+                                </IconButton>
+                            </Box>
+                        </Toolbar>
+                    </AppBar>
+                </Box>
+            </div>
+        );
+    }
+</script>

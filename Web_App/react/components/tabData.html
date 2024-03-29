@@ -1,0 +1,181 @@
+<script type="text/babel">
+    const { useState, useEffect } = React;
+    const { Typography, Paper, Stack, TextField, Divider } = window['MaterialUI'];
+    const { ungzip } = window['pako'];
+
+    const TabData = ({panel, isPanel, changeError}) => {
+        const [itemData, setItemData] = useState([]);
+
+        function decompress (str) {
+            if (str == null) {
+                return [[]];
+            }
+            const binaryString = atob(str);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return (new TextDecoder().decode(ungzip(bytes.buffer)));
+        }
+
+        function setData(data){
+            const parsedData = JSON.parse(decompress(data));
+            if (isPanel){
+                setItemData([JSONToFormat(parsedData["values"]), parsedData["config"]]);
+            }
+            else {
+                setItemData(JSONToFormat(parsedData));
+            }
+        }
+
+        function mapData(){
+            if (isPanel){
+                return <Panel panelData={itemData}> </Panel>;
+            }
+            else{
+                return <Item itemData={itemData}> </Item>;
+            }
+        }
+
+        useEffect(() => {
+            google.script.run.withSuccessHandler(setData).getPanelData(panel, isPanel);
+            console.log("Grabbing Panel Data")
+        }, []);
+
+        return (
+            <div>
+                <Paper elevation={2}>
+                    <Box sx={{ p:3 }}>
+                        <FunctionWindow changeError={changeError} panel={panel}/>
+                        {mapData()}
+                    </Box>
+                </Paper>
+            </div>
+        );
+    }
+
+    const FunctionWindow = ({changeError, panel}) => {
+        const [script, setScript] = useState("");
+        const [isRunning, setIsRunning] = useState(false);
+
+        function stringToData(arg) {
+            if (arg === "true") {
+                return true;
+            } else if (arg === "false") {
+                return false;
+            } else if (arg === "null") {
+                return null;
+            } else if (arg === "undefined") {
+                return undefined;
+            } else if (arg === "NaN") {
+                return NaN;
+            } else if (arg === "Infinity") {
+                return Infinity;
+            } else if (arg === "-Infinity") {
+                return -Infinity;
+            } else if (arg === "[]") {
+                return [];
+            } else if (arg === "{}") {
+                return {};
+            } else if (arg === "''") {
+                return "";
+            } else if (arg === '""') {
+                return "";
+            } else if (arg === "``") {
+                return "";
+            } else if (arg[0] === "'" && arg[arg.length - 1] === "'") {
+                return arg.slice(1, arg.length - 1);
+            } else if (arg[0] === '"' && arg[arg.length - 1] === '"') {
+                console.log(arg.slice(1, arg.length - 1));
+                return arg.slice(1, arg.length - 1);
+            } else if (arg[0] === '`' && arg[arg.length - 1] === '`') {
+                return arg.slice(1, arg.length - 1);
+            } else if (arg[0] === '[' && arg[arg.length - 1] === ']') {
+                return arg.slice(1, arg.length - 1).split(",").map(string => string.trim());
+            } else if (arg[0] === '{' && arg[arg.length - 1] === '}') {
+                let obj = {};
+                arg.slice(1, arg.length - 1).split(",").map(string => string.trim()).forEach(pair => {
+                    let key = pair.split(":")[0].trim();
+                    let value = pair.split(":")[1].trim();
+                    if (value === "true") {
+                        value = true;
+                    } else if (value === "false") {
+                        value = false;
+                    } else if (value === "null") {
+                        value = null;
+                    } else if (value === "undefined") {
+                        value = undefined;
+                    } else if (value === "NaN") {
+                        value = NaN;
+                    } else if (value === "Infinity") {
+                        value = Infinity;
+                    } else if (value === "-Infinity") {
+                        value = -Infinity;
+                    } else if (value === "[]") {
+                        value = [];
+                    } else if (value === "{}") {
+                        value = {};
+                    } else if (value === "''") {
+                        value = "";
+                    } else if (value === '""') {
+                        value = "";
+                    } else if (value === "``") {
+                        value = "";
+                    } else if (value[0] === "'" && value[value.length - 1] === "'") {
+                        value = value.slice(1, value.length - 1);
+                    } else if (value[0] === '"' && value[value.length - 1] === '"') {
+                        value = value.slice(1, value.length - 1);
+                    } else if (value[0] === '`' && value[value.length - 1] === '`') {
+                        value = value.slice(1, value.length - 1);
+                    } else if (value[0] === '[' && value[value.length - 1] === ']') {
+                        value = value.slice(1, value.length - 1).split(",").map(string => string.trim());
+                    }
+                    obj[key] = value;
+                });
+                return obj;
+            }
+        }
+
+        function notRunning(error){
+            setIsRunning(false);
+            changeError([error.message]);
+        }
+
+        function handleClick() {
+            if (isRunning){
+                return;
+            }
+            try {
+                let text = script.split("(")[0];
+                let raw_args = script.split("(")[1].split(")")[0].split(",").map(string => string.trim());
+                let args = raw_args.map(arg => stringToData(arg));
+                console.log(args);
+
+                google.script.run
+                    .withFailureHandler(notRunning)
+                    .withSuccessHandler(notRunning)[text](...args);
+                setIsRunning(true);
+            }
+            catch (error) {
+                notRunning({message:"Invalid Script"});
+            }
+        }
+
+        return (
+            <Stack direction="row" justifyContent="space-between" spacing={2}>
+                <Typography variant="h3" gutterBottom="true"> {panel} </Typography>
+                <Stack direction="row" spacing={2} sx={{ pb: 3}}>
+                    <Divider orientation="vertical" flexItem />
+                    <TextField
+                        id="outlined-basic"
+                        onChange={(event) => {
+                            setScript(event.target.value);
+                        }}
+                        label="Function"
+                        variant="outlined" />
+                    <Button variant="outlined" disabled={isRunning} onClick={handleClick}>RUN</Button>
+                </Stack>
+            </Stack>
+        )
+    }
+</script>

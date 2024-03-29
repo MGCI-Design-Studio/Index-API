@@ -1,0 +1,59 @@
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const { Typography, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Paper, Chip } = window['MaterialUI'];
+
+    function panelTabulator(home) {
+        if (home == null) {
+            return (<Typography variant="subtitle1"> Loading... </Typography>);
+        }
+        else if (home[0] == null){
+            return (<Typography variant="subtitle1"> Loading... </Typography>);
+        }
+
+        let home_values = home[0][0];
+        let home_format = home[0][1];
+        let config = new Config(null, home[1], true);
+        let grid = [];
+
+        let sub_cell = sheet_indexer(config.sections[0], home_values);
+
+        for (let row = sub_cell[0]; row < home_values.length; row++) {
+            let gridRow = [];
+            for (let column = sub_cell[1] - 1; column < find_num_categories(home_values[sub_cell[0] - 1]) - 1; column++) {
+                gridRow.push(
+                    <TableCell>
+                        <Chip label={<Typography variant={"body1"}>{home_values[row][column]}</Typography>} variant="outlined" />
+                    </TableCell>);
+            }
+            grid.push(<TableRow>{gridRow}</TableRow>);
+        }
+
+        return (<TableContainer sx={{alignItems:"center", justifyContent:"center"}} component={Paper} >
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        {home_values[sub_cell[0] - 1].slice(sub_cell[1] - 1, find_num_categories(home_values[sub_cell[0] - 1])).map((item) => {
+                            return (
+                                <TableCell>
+                                    <Typography variant="subtitle2">{item}</Typography>
+                                </TableCell>);
+                        })}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {grid}
+                </TableBody>
+            </Table>
+        </TableContainer>)
+    }
+
+    const Panel = ({panelData}) => {
+
+        return (
+            <div>
+                {panelTabulator(panelData)}
+            </div>
+        );
+    }
+</script>

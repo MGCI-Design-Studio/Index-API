@@ -1,0 +1,30 @@
+<script type="text/babel">
+    const { useState } = React;
+    const { useEffect } = React;
+    const { Box } = window['MaterialUI'];
+    const Index = ({accountData, checkAuth, panels}) => {
+        const [items, setItems] = useState([[null]]);
+        function itemOAuth(res){
+            if (res) {
+                google.script.run.withSuccessHandler(setItems).getItems(panels, res.data.email);
+                console.log(res.data.email);
+            }
+        }
+
+        useEffect(() => {
+            console.log(panels);
+            checkAuth(itemOAuth);
+        }, [panels]);
+
+        useEffect(() => {
+            console.log(panels);
+            checkAuth(itemOAuth);
+        }, []);
+
+        return (
+            <div>
+                <SSView panelArray={panels} itemArray={items} accountData={accountData}/>
+            </div>
+        );
+    }
+</script>

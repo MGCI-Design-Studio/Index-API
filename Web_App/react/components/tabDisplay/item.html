@@ -1,0 +1,57 @@
+<script type="text/babel">
+
+    const { useState, useEffect } = React;
+    const { Typography, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Paper, Chip } = window['MaterialUI'];
+
+    function itemTabulator(sheet) {
+        if (sheet == null) {
+            return (<Typography variant="subtitle1"> Loading... </Typography>);
+        }
+        else if (sheet[0] == null){
+            return (<Typography variant="subtitle1"> Loading... </Typography>);
+        }
+
+        let sheet_values = sheet[0];
+        let sheet_format = sheet[1];
+        let grid = [];
+
+        for (let row = 0; row < sheet_values.length; row++) {
+            let gridRow = [];
+            for (let column = 0; column < sheet_values[0].length; column++) {
+                if (sheet_values[row][column] == null || sheet_values[row][column] === ""){
+                    gridRow.push(<TableCell></TableCell>);
+                }
+                else if (row === 0 && column === 0) {
+                    gridRow.push(
+                        <TableCell>
+                            <Chip label={<Typography variant={"body1"}>{sheet_values[row][column]}</Typography>} color="primary"/>
+                        </TableCell>);
+                }
+                else {
+                    gridRow.push(
+                        <TableCell>
+                            <Chip label={<Typography variant={"body1"}>{sheet_values[row][column]}</Typography>} variant="outlined"/>
+                        </TableCell>);
+                }
+            }
+            grid.push(<TableRow>{gridRow}</TableRow>);
+        }
+
+        return (<TableContainer component={Paper} alignItems="center" justifyContent="center">
+            <Table>
+                <TableBody>
+                    {grid}
+                </TableBody>
+            </Table>
+        </TableContainer>)
+    }
+
+    const Item = ({itemData}) => {
+
+        return (
+            <div>
+                {itemTabulator(itemData)}
+            </div>
+        );
+    }
+</script>
