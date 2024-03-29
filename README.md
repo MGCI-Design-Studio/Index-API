@@ -16,7 +16,8 @@ Terminology
 
 Main Methods
 - resetProps()
-- createEmptyHandler(`name`, `template_sheet`, `home`)- publishOne(`ticket`, `home`)
+- createEmptyHandler(`name`, `template_sheet`, `home`)
+- publishOne(`ticket`, `home`)
 - publishAll(`panel`, `home`)
 - updateTicketHandler(`interval`, `updateSettings`, `home`)
 - deleteTicketHandler(`ticketNum`, `home`)
