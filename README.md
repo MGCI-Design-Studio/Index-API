@@ -1,6 +1,6 @@
 # MGCI Design Studio Index Application
 ___
-## A GAS Application for automated spreadsheet modification
+## A GAS Application for automated spreadsheet modification with an embedded Website
 
 Terminology
 - `name` name the ticket should have
