@@ -1,7 +1,7 @@
 <script type="text/babel">
     const {Tab, Box, Typography} = window['MaterialUI'];
 
-    function a11yProps(index, name) {
+    function tabProps(index, name) {
         return {
             id: `${name}-tab-${index}`,
             key: `${name}-tab-${index}`,
@@ -19,7 +19,7 @@
         }
         tabItems.forEach((item, index) => {
             if (item !== "" && item != null){
-                tabs.push(<Tab label={item} {...a11yProps(index, name)}/>);
+                tabs.push(<Tab label={item} {...tabProps(index, name)}/>);
             }
         });
 
@@ -47,7 +47,11 @@
 
                         {value === item && (
                             <Box>
-                                <TabData panel={item} isPanel={name === "panels"} changeError={changeErrorLog}/>
+                                {name==="panels" && item==="Orders" && <OrderPanel changeError={changeErrorLog}/>}
+                                {name==="panels" && item==="Personnel" && <PersonnelPanel changeError={changeErrorLog}/>}
+                                {name==="panels" && item==="Inventory" && <InventoryPanel changeError={changeErrorLog}/>}
+                                {name!=="panels" && value===item && <OrderItems panel={item} changeError={changeErrorLog}/>}
+
                             </Box>
                         )}
                     </div>);

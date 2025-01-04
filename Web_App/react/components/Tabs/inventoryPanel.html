@@ -1,0 +1,55 @@
+<script type="text/babel">
+    const { useState, useEffect } = React;
+    const { Typography, Paper, Stack, TextField, Divider } = window['MaterialUI'];
+    const { ungzip } = window['pako'];
+
+    const InventoryPanel = ({changeError}) => {
+        const [itemData, setItemData] = useState([]);
+
+        function decompress (str) {
+            if (str == null) {
+                return [[]];
+            }
+            const binaryString = atob(str);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return (new TextDecoder().decode(ungzip(bytes.buffer)));
+        }
+
+        function setData(data){
+            const parsedData = JSON.parse(decompress(data));
+            setItemData([JSONToFormat(parsedData["values"]), parsedData["config"]]);
+        }
+
+        function mapData(){
+            return <Panel panelData={itemData}> </Panel>;
+        }
+
+        useEffect(() => {
+            google.script.run.withSuccessHandler(setData).getPanelData("Inventory", true);
+            console.log("Grabbing Panel Data")
+        }, []);
+
+        return (
+            <div>
+                <Paper elevation={2}>
+                    <Box sx={{ p:3 }}>
+                        <Stack direction="row" justifyContent="space-between" spacing={2}>
+                            <Typography variant="h3" gutterBottom="true">Inventory</Typography>
+                            <FunctionWindow changeError={changeError}/>
+                        </Stack>
+                        <Stack direction="row" justifyContent="space-between" spacing={2}>
+                            <PublishAll changeError={changeError} home="Inventory" panel="Inventory"/>
+                            <UpdateAll changeError={changeError} home="Inventory"/>
+                            <Delete changeError={changeError} home="Inventory"/>
+                            <CreateEmpty changeError={changeError} home="Inventory" template="Inventory Template"/>
+                        </Stack>
+                        {mapData()}
+                    </Box>
+                </Paper>
+            </div>
+        );
+    }
+</script>

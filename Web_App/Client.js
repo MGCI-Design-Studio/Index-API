@@ -10,49 +10,33 @@ async function updateStorage(){
         const home_range = home.getDataRange();
         config_values = new Config(config, config.getDataRange().getValues(), false);
         let raw_values = formatToJSON(home_range.getRichTextValues(), home_range.getValues(), true);
-        await saveValues(scriptProperties, raw_values, config_values.toJSON(), home_sheet).then(r => console.log(r));
+        await saveValues(scriptProperties, raw_values, config_values.toJSON(), home).then(r => console.log(r));
     }
     await findAllTickets(scriptProperties, panels);
 }
 
 function findSignInEmails(){
     const scriptProperties = PropertiesService.getScriptProperties();
-    let sign_in_info = [];
     let sign_in_tokens = [];
     try{
         // Get the unpacked values
-        let sign_in_data = unpackProperties(scriptProperties.getProperty("authorization"));
-        sign_in_tokens = sign_in_data[0];
-        sign_in_info = sign_in_data[1];
+        sign_in_tokens = unpackProperties(scriptProperties.getProperty("authorization"));
     }
     catch (err) {
         console.log(err);
-        const personnel = home_builder(
-            scriptProperties,
-            SPREAD.getSheetByName("Personnel"),
-            "Personnel",
-            SPREAD.getSheetByName("Personnel Config")
-        );
-        sign_in_tokens = Config.find_sections("Sign-In Email:", personnel[0].values);
-
-        const branch_info = Config.find_sections("Branch:", personnel[0].values);
-        const position_info = Config.find_sections("Position:Priority", personnel[0].values);
-        const names = Config.find_sections("Employee", personnel[0].values);
-
-        for (let i = 0; i < branch_info.length; i++) {
-            sign_in_info.push([branch_info[i], position_info[i], names[i]]);
-        }
-        saveValue(scriptProperties, "authorization", [sign_in_tokens, sign_in_info])
+        sign_in_tokens = SS_INFO.getRange(4, 1, 1, 1).getValue().split("::");
+        saveValue(scriptProperties, "authorization", sign_in_tokens)
             .then(r => console.log(r));
     }
 
-    return [sign_in_tokens, sign_in_info];
+    return sign_in_tokens;
 }
 
 function checkAccess(email){
     const sign_in_data = findSignInEmails();
-    if (sign_in_data[0].includes(email)){
-        return sign_in_data[1][sign_in_data[0].indexOf(email)];
+    if (sign_in_data.includes(email.toLowerCase())){
+        console.log(email);
+        return "Access Granted";
     }
     return false;
 }
@@ -99,7 +83,7 @@ function getItems(panels, email){
             } catch (err) {
                 console.log(err);
                 HOME_SHEET_NAME = getPanels({position: 0})[ind];
-                panel_items = findTicketsFromSpread(scriptProperties, panel_item_names[ind], home_sheet);
+                panel_items = findTicketsFromSpread(scriptProperties, panel_item_names[ind], HOME_SHEET_NAME);
             }
             if (HOME_SHEET_NAME === panel){
                 items.push(panel_items);
@@ -133,7 +117,7 @@ async function getPanelData(panel, isPanel = false){
             let config_values = new Config(config, config.getDataRange().getValues(), false);
             let raw_values = formatToJSON(home_range.getRichTextValues(), home_range.getValues(), true);
 
-            await saveValues(scriptProperties, raw_values, config_values.toJSON(), home_sheet).then(r => console.log(r));
+            await saveValues(scriptProperties, raw_values, config_values.toJSON(), HOME_SHEET_NAME).then(r => console.log(r));
             return packProperties({
                 "values": raw_values,
                 "config": config_values.toJSON(),

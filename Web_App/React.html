@@ -1,7 +1,7 @@
 <script type="text/babel">
 
-    const { BrowserRouter: Router, Switch, Route, Routes, useLocation, Link } = ReactRouterDOM;
-    const { Box, ThemeProvider, createTheme, CssBaseline } = window['MaterialUI'];
+    const {BrowserRouter: Router, Switch, Route, useLocation} = ReactRouterDOM;
+    const {Box, ThemeProvider, createTheme, CssBaseline} = window['MaterialUI'];
 
     const App = ({settingData, updateSettings, accountData, setAccountData, panels, checkAuth}) => {
         return (
@@ -30,7 +30,7 @@
             the URL because all URLs begin with a /. So that's
             why we put this one last of all */}
                     <Route path="/">
-                        <LandingPage />
+                        <LandingPage/>
                     </Route>
                 </Switch>
             </div>
@@ -42,7 +42,7 @@
         const location = useLocation();
         console.log(location);
         return (
-            <Typography variant="h1" sx={{ pb: 2 }} color="text.secondary">
+            <Typography variant="h1" sx={{pb: 2}} color="text.secondary">
                 Current route: {location.pathname}
             </Typography>
         );
@@ -60,8 +60,7 @@
             let data = false;
             if (access) {
                 data = {name: access[2], position: positions.indexOf(access[1]), branch: branches.indexOf(access[0])};
-            }
-            else if (access === false) {
+            } else if (access === false) {
                 data = {name: "Guest", position: 5, branch: 4};
             }
             setAccountData(data);
@@ -70,7 +69,7 @@
         }
 
         function checkAuth(func) {
-            let account_id = cookies.get('userSessionToken', { path: '/' });
+            let account_id = cookies.get('userSessionToken', {path: '/'});
             if (account_id) {
                 axios
                     .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${account_id}`, {
@@ -91,23 +90,22 @@
                         func(false);
                         setAccountData(false);
                     });
-            }
-            else{
+            } else {
                 func(false);
                 setAccountData(false);
             }
         }
 
-        function setAccess(){
-            function access(res){
+        function setAccess() {
+            function access(res) {
                 setAccountData(null);
                 if (res) {
                     google.script.run.withSuccessHandler(handleAccess).checkAccess(res.data.email);
-                }
-                else {
+                } else {
                     handleAccess(null);
                 }
             }
+
             checkAuth(access);
         }
 
@@ -138,10 +136,10 @@
             })
         );
 
-        return(
+        return (
             <Router>
                 <ThemeProvider theme={indexTheme}>
-                    <CssBaseline />
+                    <CssBaseline/>
                     <Box>
                         <NavBar accountData={accountData}/>
                         <App

@@ -3,7 +3,8 @@
 
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=League+Spartan&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=League+Spartan&display=swap"
+          rel="stylesheet">
     <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -19,23 +20,29 @@
     <script src="https://cdn.jsdelivr.net/gh/MGCI-Design-Studio/Google_App_Manipulation@latest/JSON2Format.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/MGCI-Design-Studio/Google_App_Manipulation@latest/util.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/MGCI-Design-Studio/Google_App_Manipulation@latest/ConfigClass.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js" integrity="sha256-FiZMk1zgTeujzf/+vomWZGZ9r00+xnGvOgXoj0Jo1jA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"
+            integrity="sha256-FiZMk1zgTeujzf/+vomWZGZ9r00+xnGvOgXoj0Jo1jA=" crossorigin="anonymous"></script>
 
+    <!-- Recieves all code needed for the website-->
     <?!= getContent('Web_App/react/components/tabCreator') ?>
     <?!= getContent('Web_App/react/components/Spreadsheet_View') ?>
-    <?!= getContent('Web_App/react/components/tabData') ?>
+    <?!= getContent('Web_App/react/components/CodeExecution') ?>
     <?!= getContent('Web_App/react/components/tabDisplay/item') ?>
     <?!= getContent('Web_App/react/components/tabDisplay/panel') ?>
     <?!= getContent('Web_App/react/containers/indexContainer') ?>
     <?!= getContent('Web_App/react/containers/accountContainer') ?>
     <?!= getContent('Web_App/react/containers/settingsContainer') ?>
     <?!= getContent('Web_App/react/containers/navigation') ?>
-    <?!= getContent('Web_App/react/containers/landing') ?>
+    <?!= getContent('Web_App/react/containers/landingPage') ?>
+    <?!= getContent('Web_App/react/components/Tabs/ordersItems') ?>
+    <?!= getContent('Web_App/react/components/Tabs/ordersPanel') ?>
+    <?!= getContent('Web_App/react/components/Tabs/inventoryPanel') ?>
+    <?!= getContent('Web_App/react/components/Tabs/personnelPanel') ?>
     <?!= getContent('Web_App/React') ?>
 </head>
 
 <body>
-    <div id="root"> </div>
+<div id="root"></div>
 </body>
 
 </html>

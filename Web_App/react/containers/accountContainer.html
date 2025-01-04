@@ -10,7 +10,8 @@
             "message",
             (event) => {
                 if (event.origin !== "https://mgci-design-studio.github.io") return;
-                cookies.set('userSessionToken', event.data.access_token, { path: '/' });
+                console.log(event.origin);
+                cookies.set('userSessionToken', event.data.access_token, { secure: false, httpOnly: false, path: '/' });
                 setAccountData();
             },
             false,

@@ -129,6 +129,9 @@ async function setRTValues(sheet, cell, value) {
 
 // Turns the grabbed files into the JSON used to store
 function formatToJSON(format, values, formatRTV = false) {
+    console.log("formatToJSON: Entered");
+
+    // initializes variables
     let grid = [];
     let rowN = 0;
 
@@ -180,5 +183,7 @@ function formatToJSON(format, values, formatRTV = false) {
     if (rowN !== 0) {
         grid.push([rowN, values[0].length]);
     }
+
+    console.log("Exiting formatToJSON");
     return grid;
 }

@@ -20,7 +20,7 @@ class Config {
             values = found_values;
         }
 
-        console.log(values);
+        console.log("Config Constructor: " + values);
 
         this.max = values[0][0];
         this.priority_list = values[1][0];

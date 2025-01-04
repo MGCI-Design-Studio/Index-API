@@ -3,6 +3,7 @@
     const { useState, useEffect } = React;
     const { Typography, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Paper, Chip } = window['MaterialUI'];
 
+    // container for all of the data within a classic panel
     function panelTabulator(home) {
         if (home == null) {
             return (<Typography variant="subtitle1"> Loading... </Typography>);
@@ -12,7 +13,7 @@
         }
 
         let home_values = home[0][0];
-        let home_format = home[0][1];
+        let home_format = home[0][1]; // add in RTV values. Most importantly Links
         let config = new Config(null, home[1], true);
         let grid = [];
 
@@ -29,23 +30,25 @@
             grid.push(<TableRow>{gridRow}</TableRow>);
         }
 
-        return (<TableContainer sx={{alignItems:"center", justifyContent:"center"}} component={Paper} >
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {home_values[sub_cell[0] - 1].slice(sub_cell[1] - 1, find_num_categories(home_values[sub_cell[0] - 1])).map((item) => {
-                            return (
-                                <TableCell>
-                                    <Typography variant="subtitle2">{item}</Typography>
-                                </TableCell>);
-                        })}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {grid}
-                </TableBody>
-            </Table>
-        </TableContainer>)
+        return (
+            <TableContainer sx={{alignItems:"center", justifyContent:"center"}} component={Paper} >
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {home_values[sub_cell[0] - 1].slice(sub_cell[1] - 1, find_num_categories(home_values[sub_cell[0] - 1])).map((item) => {
+                                return (
+                                    <TableCell>
+                                        <Typography variant="subtitle2">{item}</Typography>
+                                    </TableCell>);
+                            })}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {grid}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )
     }
 
     const Panel = ({panelData}) => {

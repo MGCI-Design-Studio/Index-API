@@ -2,7 +2,7 @@
 // Add in the possiblity for submitting images, files, and videos to the form
 // Create an update_ticket method
 
-const TICKET_SPREADSHEET_ID = "1UzUPH0S1dvv3oP_y40rfRDnmOj4S6oGpWwRXd8JLCj0";
+const TICKET_SPREADSHEET_ID = "1b0bcAkrKQOdxtgYj1pnIRLmPaCliRXwJR9NC5-B8ec4"; // remmeeber to change
 const SPREAD = SpreadsheetApp.openById(TICKET_SPREADSHEET_ID);
 const SS_INFO = SPREAD.getSheetByName("Spreadsheet Info");
 let HOME_SHEET_NAME;
@@ -37,7 +37,7 @@ async function createEmptyUI() {
     const text = result.getResponseText();
 
     if (button === ui.Button.OK) {
-        await createEmptyHandler(text, TEMPLATE_SHEET_NAME, HOME_SHEET_NAME);
+        await createEmptyHandler(text.split(", "), TEMPLATE_SHEET_NAME, HOME_SHEET_NAME);
     }
 }
 
@@ -45,32 +45,43 @@ async function createEmptyUI() {
 async function createEmptyHandler(name, template_sheet, home = false) {
     setHomeSheetName(home);
     const template = SPREAD.getSheetByName(template_sheet);
-    const sheet = template.copyTo(SPREAD);
+    let sheets = []
 
-    let unique_name = false;
-    let counter = 0;
+    console.log(template_sheet);
 
-    // Attempts to rename the sheet with the name parameter
-    // If the name already exists, GAS will throw an error, and we will add a number to the end of it
-    while (!unique_name) {
-        try {
-            // If the original name is unique, we add no number
-            if (counter === 0) {
-                sheet.setName(name);
-            } else {
-                sheet.setName(name + counter);
-            }
-            unique_name = true;
-        } catch (err) {
-            counter++;
-        }
+    if (!Array.isArray(name)) {
+        name = [name];
     }
 
-    // Un-hides the sheet
-    sheet.showSheet();
+    for (let text of name) {
+        text = text.trim();
+        const sheet = template.copyTo(SPREAD);
 
+        let unique_name = false;
+        let counter = 0;
+
+        // Attempts to rename the sheet with the name parameter
+        // If the name already exists, GAS will throw an error, and we will add a number to the end of it
+        while (!unique_name) {
+            try {
+                // If the original name is unique, we add no number
+                if (counter === 0) {
+                    sheet.setName(text);
+                } else {
+                    sheet.setName(text + counter);
+                }
+                unique_name = true;
+            } catch (err) {
+                counter++;
+            }
+        }
+
+        // Un-hides the sheet
+        sheet.showSheet();
+        sheets.push(sheet);
+    }
     // Publishes the ticket to display on the home page
-    return await publishTicketHandler(["___SET-SUBJECT___", sheet]);
+    await publishTicketHandler(["___SET-SUBJECT___", sheets]);
 }
 
 // Function to publish all tickets
@@ -169,27 +180,33 @@ async function publishTicketHandler(tickets) {
 
     // If called from CreateEmpty
     if (tickets[0] === "___SET-SUBJECT___") {
-        // Creates ticket_class and sets the subject cell of the ticket
-        const ticket_range = tickets[1].getDataRange();
-        const ticket_class = new SheetClass(tickets[1], null, ticket_range.getValues(), ticket_range.getRichTextValues());
-        const TICKET_SUBJECT_CELL = sheet_indexer(config.sections[0], ticket_class.values);
-        ticket_class.setValues([TICKET_SUBJECT_CELL[0] + 1, TICKET_SUBJECT_CELL[1]], tickets[1].getName());
-
         // Adds the ticket to the list of saved tickets
         const panels = SS_INFO.getRange(1, 1, 1, 1).getValue().split("::");
         const PANEL_ITEM_NAMES = SS_INFO.getRange(3, 1, 1, 1).getValue().split("::");
 
         // Finds the tickets already saved
         let saved_tickets = findTickets(scriptProperties, PANEL_ITEM_NAMES[panels.indexOf(HOME_SHEET_NAME)], HOME_SHEET_NAME);
-        if (!saved_tickets.includes(tickets[1].getName())) {
-            saved_tickets.push(tickets[1].getName());
-        }
+        let to_be_published = [];
+
+        // Creates ticket_class and sets the subject cell of the ticket
+        tickets[1].forEach((ticket) => {
+            const ticket_range = ticket.getDataRange();
+            const ticket_class = new SheetClass(ticket, null, ticket_range.getValues(), ticket_range.getRichTextValues());
+            const TICKET_SUBJECT_CELL = sheet_indexer(config.sections[0], ticket_class.values);
+            ticket_class.setValues([TICKET_SUBJECT_CELL[0] + 1, TICKET_SUBJECT_CELL[1]], ticket.getName());
+
+            to_be_published.push(ticket_class);
+
+            if (!saved_tickets.includes(ticket.getName())) {
+                saved_tickets.push(ticket.getName());
+            }
+        });
 
         saveValue(scriptProperties, HOME_SHEET_NAME + "_tickets", saved_tickets)
             .then(r => console.log("Tickets Uploaded"));
 
         // Sets the tickets array to the ticket_class to publish
-        tickets = [ticket_class];
+        tickets = to_be_published;
     }
 
     // For loops through the ticket array
@@ -307,22 +324,27 @@ async function updateTicketHandler(text = null, settings = "__FIND_DIFFERENCES__
         "config": config.toJSON(),
     }));
 
-    return "Function Run Successfully";
+    return true;
 }
 
+// Initializes core variables and runs the UI to delete a ticket
 async function deleteTicketHandler(text = null, home = false) {
+    // Sets the config, home sheet, and script properties
     setHomeSheetName(home);
     const scriptProperties = PropertiesService.getScriptProperties();
     const raw_config = SPREAD.getSheetByName(HOME_SHEET_NAME + " Config");
     const home_raw = SPREAD.getSheetByName(HOME_SHEET_NAME);
     const raw_sheets = home_builder(scriptProperties, home_raw, HOME_SHEET_NAME, raw_config);
 
+    // Sheet Classes for Home and Config
     let home_class = raw_sheets[0];
     let config = raw_sheets[1];
 
     // The Subject cell of the home page
     SUBJECT_CELL = sheet_indexer(config.sections[0], home_class.values);
 
+    // Checks if there is text passed in this function
+    // If not, opens a UI window
     if (text == null) {
         const ui = SpreadsheetApp.getUi();
         const result = ui.prompt(
@@ -336,35 +358,39 @@ async function deleteTicketHandler(text = null, home = false) {
             text = result.getResponseText();
         }
     }
+
+    // runs the delete ticket function
     deleteTicket(config, home_class, text);
 
+    // updates the changed sheets to the cloud
     await scriptProperties.setProperty(HOME_SHEET_NAME, packProperties({
         "values": formatToJSON(home_class.format, home_class.values, false),
         "config": config.toJSON(),
     }));
 
-    return "Function Run Successfully";
+    return true;
 }
 
-function deletePriority(config, home_class, priority_cell, link, max) {
+// Deletes the priority cell
+function deletePriority(config, home_class, prio_cell, link) {
     // Starts checking cells 2 below the title cell
-    for (let i = 2; i < home_class.values.length - priority_cell; i++) {
+    for (let row = 2; row < home_class.values.length - prio_cell; row++) {
         // Checks the range of priorities left to right
-        for (let j = -1; j < config.priority_list.length; j++) {
-            let checkCell = home_class.format[priority_cell[0] + i - 1][priority_cell[1] + j - 1]; // Grabs the cell
+        for (let col = -1; col < config.priority_list.length; col++) {
+            // Grabs the cell
+            let checkCell = home_class.format[prio_cell[0] + row - 1][prio_cell[1] + col - 1];
             if (checkCell != null && checkCell !== "") { // Checks if the cell has nothing in it
                 // Loops through the RTV runs (GAS)
-                for (let k = 0; k < checkCell.length; k++) {
-                    if (checkCell[k][2] === link) { // If that specific run has the link, deletes it
-                        home_class.sheet.getRange(priority_cell[0] + i, priority_cell[1] + j, 1, 1).deleteCells(SpreadsheetApp.Dimension.ROWS);
+                for (let run = 0; run < checkCell.length; run++) {
+                    if (checkCell[run][2] === link) { // If that specific run has the link, deletes it
+                        home_class.sheet.getRange(prio_cell[0] + row, prio_cell[1] + col, 1, 1).deleteCells(SpreadsheetApp.Dimension.ROWS);
 
-                        for (let temp_row = priority_cell[0] + i - 1; temp_row < home_class.values.length - 1; temp_row++) {
-                            home_class.format[temp_row][priority_cell[1] + j - 1] = home_class.format[temp_row + 1][priority_cell[1] + j - 1];
-                            home_class.values[temp_row][priority_cell[1] + j - 1] = home_class.values[temp_row + 1][priority_cell[1] + j - 1];
+                        for (let temp_row = prio_cell[0] + row - 1; temp_row < home_class.values.length - 1; temp_row++) {
+                            home_class.format[temp_row][prio_cell[1] + col - 1] = home_class.format[temp_row + 1][prio_cell[1] + col - 1];
+                            home_class.values[temp_row][prio_cell[1] + col - 1] = home_class.values[temp_row + 1][prio_cell[1] + col - 1];
                         }
-                        config.current_priority_tickets(j, -1);
-                        i = max;
-                        j = config.priority_list.length;
+                        config.current_priority_tickets(col, -1);
+                        return;
                     }
                 }
             }

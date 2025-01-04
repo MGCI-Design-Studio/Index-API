@@ -134,12 +134,14 @@ function publishTicket(config, sheet_class, home_class, max, setting, home_sheet
         sheet_class.values[subject[0]][subject[1] - 1], sheet_name, false);
 
     if (existing) {
-        deletePriority(config, home_class, config.priority_list, priority_cell, "#gid=" + sheet_class.sheet.getSheetId(), max);
+        deletePriority(config, home_class, config.priority_list, priority_cell, "#gid=" + sheet_class.sheet.getSheetId());
     }
 
     if (!config.priority_exclusion.includes(sheet_class.values[int_status[0] - 1][int_status[1] - 1])) {
         const cur_pri_tick = config.current_priority_tickets(priority_index, 1);
-
+        console.log(cur_pri_tick);
+        console.log("PublishTicket: Setting Priority Cell:" + JSON.stringify([priority_cell[0] + cur_pri_tick + 2, priority_cell[1] + priority_index]))
+        console.log("PublishTicket: Subject Cell:" + JSON.stringify(subject));
         home_class.setRichValue([priority_cell[0] + cur_pri_tick + 2, priority_cell[1] + priority_index],
             sheet_class.values[subject[0]][subject[1] - 1], sheet_name);
     }
@@ -182,7 +184,7 @@ function deleteTicket(config, home_class, text) {
                 return s.getSheetId().toString() === link[j][2].split("gid=")[1];
             })[0];
 
-            deletePriority(config, home_class, priority_cell, link[j][2], config.max)
+            deletePriority(config, home_class, priority_cell, link[j][2])
             const cat_row = home_class.values[SUBJECT_CELL[0] - 1];
 
             const last_cat = find_num_categories(cat_row);
