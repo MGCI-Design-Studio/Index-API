@@ -3,8 +3,8 @@ ___
 ## A GAS Application for automated spreadsheet modification with an embedded Website
 
 Demo: 
-Spreasheet - https://docs.google.com/spreadsheets/d/1b0bcAkrKQOdxtgYj1pnIRLmPaCliRXwJR9NC5-B8ec4/edit?usp=sharing
-Connected Web App - https://bit.ly/MGDS_Index
+- [Spreadsheet](https://docs.google.com/spreadsheets/d/1b0bcAkrKQOdxtgYj1pnIRLmPaCliRXwJR9NC5-B8ec4/edit?usp=sharing)
+- [Connected Web App](https://bit.ly/MGDS_Index)
 
 Terminology
 - `name` name the ticket should have
