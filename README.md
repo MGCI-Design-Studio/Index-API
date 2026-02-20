@@ -1,12 +1,24 @@
 # MGCI Design Studio Index Application
 ___
-## A GAS Application for automated spreadsheet modification with an embedded Website
+A GAS Application for automated spreadsheet modification with an embedded Website (DEPRECATED)
 
-Demo: 
-- [Spreadsheet](https://docs.google.com/spreadsheets/d/1b0bcAkrKQOdxtgYj1pnIRLmPaCliRXwJR9NC5-B8ec4/edit?usp=sharing)
+## Demo: 
+<img width="1866" height="1041" alt="image" src="https://github.com/user-attachments/assets/e3a99908-d5ed-40f5-aef4-e244e6284590" />
+
 - [Connected Web App](https://bit.ly/MGDS_Index)
 
-Terminology
+## Project Structure
+- WebApp contains the React website code, using Google App Script as the backend
+- Panels contains scripts to be used on the spreadsheet
+- Google_App_Manipulation is a seperately maintained library of helper scripts to manipulate a Google Spreadsheet using Google App Script
+
+### Features
+- Google OAuth implemented on the Web App (Weren't used in production due to TDSB restrictions)
+- Efficient grabbing and caching of spreadsheet data
+- Full CRUD control of each Spreadsheet using Google App Script
+- Dynamically generated tabs for Spreadsheet display
+
+## Terminology
 - `name` name the ticket should have
 - `ticket` name of the ticket
 - `ticketNum` the ticket number
@@ -18,7 +30,7 @@ Terminology
 	- `"__FIND_DIFFERENCES__"` no interval needed, finds differences and updates them
 	- `"__TICKET__"` uses the interval
 
-Main Methods
+## Main Methods
 - resetProps()
 - createEmptyHandler(`name`, `template_sheet`, `home`)
 - publishOne(`ticket`, `home`)
