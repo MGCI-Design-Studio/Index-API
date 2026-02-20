@@ -4,6 +4,7 @@ A GAS Application for automated spreadsheet modification with an embedded Websit
 
 ## Demo: 
 <img width="1866" height="1041" alt="image" src="https://github.com/user-attachments/assets/e3a99908-d5ed-40f5-aef4-e244e6284590" />
+<img width="1611" height="485" alt="image" src="https://github.com/user-attachments/assets/3baf5976-11cb-4265-8f28-6fc022d72385" />
 
 - [Connected Web App](https://bit.ly/MGDS_Index)
 
